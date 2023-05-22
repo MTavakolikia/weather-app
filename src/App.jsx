@@ -1,6 +1,11 @@
 import { useState } from "react";
 import apiClient, { weatherApiKey } from "../services/api-client";
 import "./App.css";
+import { IoLocationSharp } from "react-icons/io5";
+import { FaThermometerThreeQuarters } from "react-icons/fa";
+import { TbSteam } from "react-icons/tb";
+import { MdRefresh } from "react-icons/md";
+import { BsSearch } from "react-icons/bs";
 
 import Logo from "./assets/Logo.svg";
 import FeelsLike from "./assets/feels-like.svg";
@@ -11,17 +16,20 @@ function App() {
   const [data, setData] = useState();
   const [location, setLocation] = useState("");
   const [error, setError] = useState("");
+  const onSearch = () => {
+    apiClient
+      .get(
+        `/${location}?unitGroup=metric&key=${weatherApiKey}&contentType=json`
+      )
+      .then((res) => {
+        setData(res.data);
+        console.log(data);
+      })
+      .catch((err) => setError(err.message));
+  };
   const getData = (e) => {
     if (e.key === "Enter") {
-      apiClient
-        .get(
-          `/${location}?unitGroup=metric&key=${weatherApiKey}&contentType=json`
-        )
-        .then((res) => {
-          setData(res.data);
-          console.log(data);
-        })
-        .catch((err) => setError(err.message));
+      onSearch();
     }
   };
   if (error) return <p>{error}</p>;
@@ -33,21 +41,58 @@ function App() {
       </div>
 
       <div className="w-3/5 rounded-sm contentContainer">
-        <div>
+        <div className="flex items-center">
           <input
             type="text"
             onChange={(e) => setLocation(e.target.value)}
             onKeyPress={getData}
+            value={location}
             placeholder="Enter Location..."
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-400"
+            className="shadow appearance-none border uppercase rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-400"
           />
+
+          <span
+            className="bg-slate-700 rounded-md cursor-pointer p-1 mx-2 "
+            onClick={onSearch}
+            title="Search"
+          >
+            <BsSearch className="text-white font-bold text-2xl " />
+          </span>
+          {data && (
+            <span
+              className="bg-slate-700 rounded-md cursor-pointer p-1"
+              onClick={() => {
+                setData("");
+                setLocation("");
+              }}
+              title="Reset"
+            >
+              <MdRefresh className="text-white font-bold text-2xl " />
+            </span>
+          )}
         </div>
         {data ? (
-          <div className=" rounded p-4 shadow-lg my-5">
-            <h4 className="text-left">{data?.address.toUpperCase()}</h4>
-            <h2>{data && data.currentConditions.temp}°C</h2>
-            <h5>{data?.currentConditions.conditions}</h5>
-            <p className="mt-3">{data?.description}</p>
+          <div className=" rounded p-4 shadow-lg my-5 bg-red-300 bg-opacity-70">
+            <h4 className="text-left flex items-center">
+              <span className="mr-1 text-blue-500">
+                <IoLocationSharp />
+              </span>
+              {data?.address.toUpperCase()}
+            </h4>
+
+            <h2 className="text-left flex items-center">
+              <span className="mr-1 text-gray-700">
+                <FaThermometerThreeQuarters />
+              </span>
+              {data && data.currentConditions.temp}°C
+            </h2>
+            <h5 className="text-left flex items-center">
+              <span className="mr-1 text-orange-800">
+                <TbSteam />
+              </span>
+              {data?.currentConditions.conditions}
+            </h5>
+            <p className="mt-3 text-gray-700">{data?.description}</p>
           </div>
         ) : null}
         {data ? (
