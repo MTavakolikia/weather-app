@@ -11,6 +11,7 @@ import Logo from "./assets/Logo.svg";
 import FeelsLike from "./assets/feels-like.svg";
 import Humidity from "./assets/humidity.png";
 import WindSpeed from "./assets/wind-speed.png";
+import NotFound from "./assets/not-found.svg";
 
 function App() {
   const [data, setData] = useState();
@@ -32,7 +33,7 @@ function App() {
       onSearch();
     }
   };
-  if (error) return <p>{error}</p>;
+
   return (
     <div className="bg-gradient-to-r from-yellow-400 via-red-500 to-pink-500  w-full h-screen flex justify-center items-center">
       <div className="absolute left-2 top-2 flex justify-center items-center">
@@ -71,6 +72,18 @@ function App() {
             </span>
           )}
         </div>
+        {error && (
+          <div
+            className="flex p-4 mt-4 text-sm rounded-lg bg-red-50 text-red-500"
+            role="alert"
+          >
+            <img src={NotFound} width="22px" className="mr-2 text-red-800" />
+            <div>
+              <span className="font-medium">Not Found!</span> The Country you
+              searched for not exist on our database.
+            </div>
+          </div>
+        )}
         {data ? (
           <div className=" rounded p-4 shadow-lg my-5 bg-red-300 bg-opacity-70">
             <h4 className="text-left flex items-center">
